@@ -1,13 +1,15 @@
+import math
 
 #______________________________________________________________________________
 # Simple Data Structures: infinity, Dict, Struct
+
 
 infinity = 1.0e400
 
 
 def Dict(**entries):
     """Create a dict out of the argument=value arguments.
-    >>> Dict(a=1, b=2, c=3)
+    "">>> Dict(a=1, b=2, c=3)
     {'a': 1, 'c': 3, 'b': 2}
     """
     return entries
@@ -265,9 +267,9 @@ def median(values):
     """Return the middle value, when the values are sorted.
     If there are an odd number of elements, try to average the middle two.
     If they can't be averaged (e.g. they are strings), choose one at random.
-    >>> median([10, 100, 11])
+    "">>> median([10, 100, 11])
     11
-    >>> median([1, 2, 3, 4])
+    "">>> median([1, 2, 3, 4])
     2.5
     """
     n = len(values)
@@ -545,7 +547,7 @@ class FIFOQueue(Queue):
         return e
 
 
-class BranchAndBoundQueue(Queue):
+class ShortestPathQueue(Queue):
     def __init__(self):
         self.A = []
 
@@ -563,6 +565,29 @@ class BranchAndBoundQueue(Queue):
     def pop(self):
         return self.A.pop()
 
+class BranchAndBoundWithHeuristicQueue(Queue):
+    def __init__(self, problem):
+        self.A = []
+        self.problem = problem
+
+    def add_path_cost(self, item):
+        if self.problem.h(item) == None:
+            return item.path_cost
+        return item.path_cost + self.problem.h(item)
+
+    def append(self, item):
+        self.A.append(item)
+        self.A.sort(key=lambda x: self.add_path_cost(x), reverse=True)
+
+    def __len__(self):
+        return len(self.A)
+
+    def extend(self, items):
+        for item in items:
+            self.append(item)
+
+    def pop(self):
+        return self.A.pop()
 
 
 ## Fig: The idea is we can define things like Fig[3,10] later.
