@@ -8,6 +8,7 @@ functions."""
 from utils import *
 import random
 import sys
+from typing import Tuple
 
 
 # ______________________________________________________________________________
@@ -93,29 +94,22 @@ class Node:
 # ______________________________________________________________________________
 ## Uninformed Search algorithms
 
-def graph_search(problem, fringe):
+def graph_search(problem, fringe) -> Tuple[Node, list]:
     """Search through the successors of a problem to find a goal.
     The argument fringe should be an empty queue.
     If two paths reach a state, only use the best one. [Fig. 3.18]"""
     closed = {}
-    visitedNodes = 0
-    generatedNodes = 1 # The root node
     fringe.append(Node(problem.initial))
     while fringe:
         node = fringe.pop()
-        visitedNodes += 1
         if problem.goal_test(node.state):
-            print("Nodos generados: ", generatedNodes)
-            print("Nodos visitados: ", visitedNodes)
-            print("Coste: ", node.path_cost)
-            return node
+            closed[node.state] = True
+            return node, closed
         if node.state not in closed:
             closed[node.state] = True
             for node in node.expand(problem):
-                generatedNodes += 1
                 if node.state not in closed:
-                    fringe.extend(node.expand(problem))
-
+                    fringe.append(node)
     return None
 
 
@@ -129,13 +123,25 @@ def depth_first_graph_search(problem):
     return graph_search(problem, Stack())
 
 
-def shortest_path(problem):
-    """Search the deepest nodes in the search tree first. [p 74]"""
-    return graph_search(problem, ShortestPathQueue())
+def branch_and_bound(problem):
+    """Search the shallowest nodes in the search tree first. [p 74]"""
+    return graph_search(problem, PriorityQueue())  # FIFOQueue -> fringe
 
-def branch_and_bound_with_heuristic(problem):
-    """Search the deepest nodes in the search tree first. [p 74]"""
-    return graph_search(problem, BranchAndBoundWithHeuristicQueue(problem))
+def branch_and_bound_heuristic(problem) -> Tuple[Node, list]:
+    """Search the shallowest nodes in the search tree first using the heuristic function."""
+    return graph_search(problem, PriorityQueue(heuristic=True, problem=problem))
+
+def print_search_results(node: Node, visited_nodes: list):
+    print("Visited nodes: ", len(visited_nodes))
+    print("Path = ", node.path())
+    print("Path Cost = ", node.path_cost)
+
+
+
+
+
+
+
 
 # _____________________________________________________________________________
 # The remainder of this file implements examples for the search algorithms.
@@ -195,7 +201,7 @@ class Graph:
 
 
 def UndirectedGraph(dict=None):
-    """Build a Graph where every edge (including future ones) goes both ways."""
+    """Build a Graph where every edge (including future one s) goes both ways."""
     return Graph(dict=dict, directed=False)
 
 
