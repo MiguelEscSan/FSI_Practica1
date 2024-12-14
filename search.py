@@ -103,7 +103,6 @@ def graph_search(problem, fringe) -> Tuple[Node, list]:
     while fringe:
         node = fringe.pop()
         if problem.goal_test(node.state):
-            closed[node.state] = True
             return node, closed
         if node.state not in closed:
             closed[node.state] = True
@@ -131,16 +130,10 @@ def branch_and_bound_heuristic(problem) -> Tuple[Node, list]:
     """Search the shallowest nodes in the search tree first using the heuristic function."""
     return graph_search(problem, PriorityQueue(heuristic=True, problem=problem))
 
-def print_search_results(node: Node, visited_nodes: list):
-    print("Visited nodes: ", len(visited_nodes))
+def print_search_resuls(node: Node, visited_nodes: list):
+    print("Visited nodes: ", visited_nodes) 
     print("Path = ", node.path())
     print("Path Cost = ", node.path_cost)
-
-
-
-
-
-
 
 
 # _____________________________________________________________________________
